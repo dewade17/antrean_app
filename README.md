@@ -1,17 +1,27 @@
 # antrean_app
 
-A new Flutter project.
+A simple, clean Flutter mobile application.
 
-## Getting Started
+## Prerequisites
 
-This project is a starting point for a Flutter application.
+Before you start, make sure you have:
+- **Flutter** (stable channel) installed and added to your PATH  
+- **Git** installed  
+- **Android Studio** (or Xcode on macOS) for emulators and SDKs  
+- A physical device or an emulator available
 
-A few resources to get you started if this is your first Flutter project:
+Verify your setup by running:
+```bash
+flutter doctor
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Run the App — Step by Step
+1. Clone the repository to download the project to your computer.
+  - git clone https://github.com/dewade17/antrean_app.git
+2. Change directory into the project so you can work with its files.
+  -cd antrean_app
+3. Install dependencies so Flutter has everything it needs to build.
+  -flutter pub get
+4. Run the application and wait for the build to finish.
+  - flutter run
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-"# antrean_app" 
+Enjoy, and happy coding 🙂
