@@ -38,6 +38,10 @@ class ApiService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
+    if (token == null || token.isEmpty) {
+      throw Exception('Token not found. Please login again.');
+    }
+
     final response = await http.post(
       Uri.parse('${Endpoints.baseURL}/$endpoint'),
       headers: {
@@ -62,6 +66,10 @@ class ApiService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
+    if (token == null || token.isEmpty) {
+      throw Exception('Token not found. Please login again.');
+    }
+
     final response = await http.put(
       Uri.parse('${Endpoints.baseURL}/$endpoint'),
       headers: {
@@ -84,6 +92,10 @@ class ApiService {
   Future<Map<String, dynamic>> deleteDataPrivate(String endpoint) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+
+    if (token == null || token.isEmpty) {
+      throw Exception('Token not found. Please login again.');
+    }
 
     final response = await http.delete(
       Uri.parse('${Endpoints.baseURL}/$endpoint'),
