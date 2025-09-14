@@ -1,13 +1,20 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:antrean_app/utils/colors.dart';
+import 'package:antrean_app/provider/dokter/detail_dokter_provider.dart';
+import 'package:antrean_app/constraints/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart'; // untuk DateFormat.E('id_ID')
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:provider/provider.dart';
 
 class CalendarDokter extends StatefulWidget {
-  const CalendarDokter({super.key});
+  final String idDokter;
+
+  const CalendarDokter({
+    super.key,
+    required this.idDokter,
+  });
 
   @override
   State<CalendarDokter> createState() => _CalendarDokterState();
@@ -16,43 +23,69 @@ class CalendarDokter extends StatefulWidget {
 class _CalendarDokterState extends State<CalendarDokter> {
   DateTime today = DateTime.now();
 
-  // Simulasi tanggal yang tersedia
-  final Set<DateTime> availableDates = {
-    DateTime.utc(2025, 6, 2),
-    DateTime.utc(2025, 6, 4),
-    DateTime.utc(2025, 6, 6),
-    DateTime.utc(2025, 6, 10),
-    DateTime.utc(2025, 6, 11),
-    DateTime.utc(2025, 6, 18),
-    DateTime.utc(2025, 6, 25),
-  };
+  bool isSameDayLocal(DateTime a, DateTime b) {
+    final al = a.toLocal();
+    final bl = b.toLocal();
+    return al.year == bl.year && al.month == bl.month && al.day == bl.day;
+  }
 
-  bool isSameDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
+  DateTime dateOnlyLocal(DateTime d) {
+    final dl = d.toLocal();
+    return DateTime(dl.year, dl.month, dl.day);
+  }
+
+  Future<void> _fetchMonth() async {
+    final firstDay = DateTime(today.year, today.month, 1);
+    final lastDay = DateTime(today.year, today.month + 1, 0);
+
+    await context.read<DetailDokterProvider>().fetch(
+          idDokter: widget.idDokter,
+          start: firstDay,
+          end: lastDay,
+          status: 'all',
+        );
   }
 
   List<DropdownMenuItem<DateTime>> _generateDropdownItems() {
     final currentYear = DateTime.now().year;
-
-    List<DropdownMenuItem<DateTime>> items = [];
-    for (int month = 1; month <= 12; month++) {
-      items.add(
-        DropdownMenuItem(
-          value: DateTime(currentYear, month),
-          child: Text("${_getMonthName(month)} $currentYear"),
-        ),
+    return List.generate(12, (i) {
+      final month = i + 1;
+      return DropdownMenuItem(
+        value: DateTime(currentYear, month),
+        child: Text("${_getMonthName(month)} $currentYear"),
       );
-    }
-    return items;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchMonth();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final detailProv = context.watch<DetailDokterProvider>();
+
+    // Hari yang memiliki minimal satu slot tersedia → titik hijau
+    final Set<DateTime> availableDays = detailProv.daysWithAvailable;
+
+    // Semua slot pada hari terpilih (chips jam)
+    final slotsOfDay = detailProv.slotsOfDate(today);
+
+    // Hanya slot yang tersedia pada hari terpilih (untuk legend)
+    final availableSlots = detailProv.availableSlotsOfDate(today);
+    final int availableCount = availableSlots.length;
+    final int notAvailableCount = slotsOfDay.length - availableCount;
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // header + dropdown bulan (tetap)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -75,11 +108,12 @@ class _CalendarDokterState extends State<CalendarDokter> {
                   child: DropdownButton<DateTime>(
                     value: DateTime(today.year, today.month),
                     items: _generateDropdownItems(),
-                    onChanged: (newValue) {
+                    onChanged: (newValue) async {
                       if (newValue != null) {
                         setState(() {
-                          today = newValue;
+                          today = DateTime(newValue.year, newValue.month, 1);
                         });
+                        await _fetchMonth();
                       }
                     },
                     icon: const Icon(Icons.keyboard_arrow_down_rounded),
@@ -94,6 +128,8 @@ class _CalendarDokterState extends State<CalendarDokter> {
             ],
           ),
           const SizedBox(height: 20),
+
+          // kalender (desain tetap), dot = hari yang punya slot tersedia
           Container(
             color: AppColors.accentColor,
             padding: const EdgeInsets.symmetric(vertical: 0),
@@ -103,27 +139,24 @@ class _CalendarDokterState extends State<CalendarDokter> {
               firstDay: DateTime.utc(2020),
               lastDay: DateTime.utc(2030),
               focusedDay: today,
-              selectedDayPredicate: (day) => isSameDay(day, today),
+              selectedDayPredicate: (day) => isSameDayLocal(day, today),
               onDaySelected: (selectedDay, focusedDay) {
                 setState(() {
                   today = selectedDay;
                 });
+                // fetch tetap per-bulan
               },
-              calendarStyle: CalendarStyle(
+              calendarStyle: const CalendarStyle(
                 isTodayHighlighted: false,
                 outsideDaysVisible: true,
-                // or EdgeInsets.all(1)
               ),
               headerVisible: false,
               calendarBuilders: CalendarBuilders(
                 dowBuilder: (context, day) {
-                  final text =
-                      DateFormat.E('id_ID').format(day); // e.g. Min, Sen
-
+                  final text = DateFormat.E('id_ID').format(day);
                   return Container(
-                    height: 50, // Sama persis dengan rowHeight agar sejajar
-                    alignment:
-                        Alignment.center, // Penting: teks tepat di tengah
+                    height: 50,
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(
                       border:
                           Border.all(color: Colors.grey.shade400, width: 0.5),
@@ -132,8 +165,7 @@ class _CalendarDokterState extends State<CalendarDokter> {
                       text,
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
-                        fontSize:
-                            14, // Lebih kecil dari tanggal agar tidak tabrakan
+                        fontSize: 14,
                       ),
                     ),
                   );
@@ -142,54 +174,69 @@ class _CalendarDokterState extends State<CalendarDokter> {
                   return _buildDayCell(day, false, isOutside: true);
                 },
                 defaultBuilder: (context, day, focusedDay) {
-                  final available =
-                      availableDates.any((d) => isSameDay(d, day));
-                  return _buildDayCell(day, available);
+                  final avail = availableDays
+                      .contains(DateTime(day.year, day.month, day.day));
+                  return _buildDayCell(day, avail);
                 },
                 selectedBuilder: (context, day, focusedDay) {
-                  return _buildDayCell(day, true, isSelected: true);
+                  final avail = availableDays
+                      .contains(DateTime(day.year, day.month, day.day));
+                  return _buildDayCell(day, avail, isSelected: true);
                 },
               ),
             ),
           ),
+
           const SizedBox(height: 12),
+
+          // chips jam (tetap), isi = semua slot hari terpilih
+          // chips jam (tetap), isi = semua slot hari terpilih
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: List.generate(9, (index) {
-              final hour = 8 + index;
-              final timeText = "${hour.toString().padLeft(2, '0')} - 00";
+            children: slotsOfDay.map((j) {
+              final isAvail =
+                  context.read<DetailDokterProvider>().isSlotAvailable(j);
+              final double op =
+                  isAvail ? 1.0 : 0.4; // <-- opacity kalau TIDAK tersedia
+              final timeText = "${j.jamMulaiHhmm} - ${j.jamSelesaiHhmm}";
+
               return Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade900,
+                  color: Colors.blue.shade900.withOpacity(op), // <-- di sini
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   timeText,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(op), // <-- dan di sini
+                  ),
                 ),
               );
-            }),
+            }).toList(),
           ),
+
           const SizedBox(height: 16),
+
+          // legend (TIDAK mengubah desain) — teksnya menampilkan jumlah
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Row(
                 children: [
                   Icon(Icons.circle, color: AppColors.primaryColor, size: 10),
-                  SizedBox(width: 4),
-                  Text("Tidak Tersedia"),
+                  const SizedBox(width: 4),
+                  Text("Tidak Tersedia ($notAvailableCount)"),
                 ],
               ),
-              SizedBox(width: 20),
+              const SizedBox(width: 20),
               Row(
                 children: [
-                  Icon(Icons.circle_outlined, size: 10),
-                  SizedBox(width: 4),
-                  Text("Tersedia"),
+                  const Icon(Icons.circle_outlined, size: 10),
+                  const SizedBox(width: 4),
+                  Text("Tersedia ($availableCount)"),
                 ],
               ),
             ],
@@ -199,8 +246,12 @@ class _CalendarDokterState extends State<CalendarDokter> {
     );
   }
 
-  Widget _buildDayCell(DateTime day, bool available,
-      {bool isSelected = false, bool isOutside = false}) {
+  Widget _buildDayCell(
+    DateTime day,
+    bool available, {
+    bool isSelected = false,
+    bool isOutside = false,
+  }) {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade400, width: 0.5),
@@ -227,14 +278,16 @@ class _CalendarDokterState extends State<CalendarDokter> {
               ),
             ),
             if (available && !isOutside)
-              Positioned(
+              const Positioned(
                 bottom: 6,
-                child: Container(
+                child: SizedBox(
                   width: 6,
                   height: 6,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.green,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.green,
+                    ),
                   ),
                 ),
               ),

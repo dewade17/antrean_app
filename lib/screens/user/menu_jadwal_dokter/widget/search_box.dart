@@ -1,4 +1,6 @@
+import 'package:antrean_app/provider/dokter/dokter_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SearchBox extends StatelessWidget {
   final TextEditingController searchController;
@@ -11,13 +13,14 @@ class SearchBox extends StatelessWidget {
       child: TextFormField(
         controller: searchController,
         onChanged: (value) {
-          print("Search: $value"); // Ganti dengan logika pencarian kamu
+          // set query ke provider (tanpa debounce, sesuai permintaan)
+          context.read<DokterProvider>().setSearch(value);
         },
         decoration: InputDecoration(
           hintText: 'Cari dokter...',
           filled: true,
           fillColor: Colors.white,
-          prefixIcon: Icon(Icons.search),
+          prefixIcon: const Icon(Icons.search),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
           ),

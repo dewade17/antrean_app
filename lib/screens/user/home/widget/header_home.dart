@@ -1,6 +1,8 @@
-import 'package:antrean_app/utils/colors.dart';
+import 'package:antrean_app/provider/Auth/auth_provider.dart';
+import 'package:antrean_app/constraints/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class HeaderHome extends StatelessWidget {
   const HeaderHome({super.key});
@@ -29,7 +31,9 @@ class HeaderHome extends StatelessWidget {
               } else if (value == 3) {
                 Navigator.pushNamed(context, '/info');
               } else if (value == 4) {
-                Navigator.pushReplacementNamed(context, '/login');
+                final authProvider =
+                    Provider.of<AuthProvider>(context, listen: false);
+                authProvider.logout(context);
               }
             },
             itemBuilder: (context) => [

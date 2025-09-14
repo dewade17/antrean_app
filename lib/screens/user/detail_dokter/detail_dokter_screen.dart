@@ -1,16 +1,25 @@
+import 'package:antrean_app/provider/dokter/detail_dokter_provider.dart';
 import 'package:antrean_app/screens/user/detail_dokter/widget/calendar_dokter.dart';
 import 'package:antrean_app/screens/user/detail_dokter/widget/header_detail_dokter.dart';
-import 'package:antrean_app/utils/colors.dart';
+import 'package:antrean_app/constraints/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 
 class DetailDokterScreen extends StatefulWidget {
-  const DetailDokterScreen({super.key});
+  final String idDokter; // <- diteruskan ke CalendarDokter
+
+  const DetailDokterScreen({super.key, required this.idDokter});
 
   @override
   State<DetailDokterScreen> createState() => _DetailDokterScreenState();
 }
 
 class _DetailDokterScreenState extends State<DetailDokterScreen> {
+  Future<void> _onRefresh() async {
+    await context.read<DetailDokterProvider>().refresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,18 +83,22 @@ class _DetailDokterScreenState extends State<DetailDokterScreen> {
                     alignment: Alignment.topCenter,
                     child: Padding(
                       padding: const EdgeInsets.only(top: 80),
-                      child: HeaderDetailDokter(),
+                      child: const HeaderDetailDokter(),
                     ),
                   ),
                 ],
               ),
             ),
 
-            // Expanded scrollable content
+            // Expanded scrollable content + pull-to-refresh
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(top: 10, bottom: 20),
-                child: CalendarDokter(),
+              child: RefreshIndicator(
+                onRefresh: _onRefresh,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.only(top: 10, bottom: 20),
+                  child: CalendarDokter(idDokter: widget.idDokter),
+                ),
               ),
             ),
           ],

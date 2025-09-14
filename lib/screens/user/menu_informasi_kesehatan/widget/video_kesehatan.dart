@@ -1,5 +1,5 @@
 import 'package:antrean_app/screens/user/menu_informasi_kesehatan/more_menu_informasi_kesehatan/news_information/detail_news_information/video_detail_information.dart';
-import 'package:antrean_app/utils/colors.dart';
+import 'package:antrean_app/constraints/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

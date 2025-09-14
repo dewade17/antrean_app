@@ -1,4 +1,4 @@
-import 'package:antrean_app/utils/colors.dart';
+import 'package:antrean_app/constraints/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -20,7 +20,7 @@ class _CalendarFieldState extends State<CalendarField> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 190,
+      width: 380,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

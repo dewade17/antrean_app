@@ -1,123 +1,116 @@
+import 'package:antrean_app/provider/Auth/register_provider.dart';
 import 'package:antrean_app/screens/auth_screen/register/widget/form_header.dart';
 import 'package:antrean_app/screens/auth_screen/register/widget/form_register.dart';
 import 'package:antrean_app/screens/auth_screen/register/widget/login_text.dart';
 import 'package:antrean_app/screens/auth_screen/register/widget/register_button.dart';
-import 'package:antrean_app/utils/colors.dart';
+import 'package:antrean_app/constraints/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
-}
-
-class _RegisterScreenState extends State<RegisterScreen> {
-  final emailController = TextEditingController();
-  final nameController = TextEditingController();
-  final dateController = TextEditingController();
-  final jeniskelaminController = TextEditingController();
-  final noteleponeController = TextEditingController();
-  final passwordController = TextEditingController();
-  final konfirmasiPasswordController = TextEditingController();
-
-  bool _obscureText = true;
-  bool _obscureTextConfirm = true;
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.primaryColor,
-      body: Stack(
-        children: [
-          // Layer background gambar atas
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  AppColors.primaryColor,
-                  AppColors.secondaryColor,
-                ],
-              ),
-            ),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 50),
-                child: Image.asset(
-                  "assets/images/Register_Screen.png",
-                  height: 250,
-                  width: 300,
-                ),
-              ),
-            ),
-          ),
+    return ChangeNotifierProvider(
+      create: (_) => RegisterProvider(),
+      child: Builder(
+        builder: (context) {
+          final p = context.watch<RegisterProvider>();
 
-          // Layer form di bawah gambar
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.7,
-              decoration: ShapeDecoration(
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(35),
-                    topRight: Radius.circular(35),
+          return Scaffold(
+            backgroundColor: AppColors.primaryColor,
+            body: Stack(
+              children: [
+                // Background
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        AppColors.primaryColor,
+                        AppColors.secondaryColor,
+                      ],
+                    ),
                   ),
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.accentColor,
-                    AppColors.backgroundColor,
-                  ],
-                ),
-              ),
-              child: SafeArea(
-                top: false,
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 0, vertical: 24),
-                  child: Column(
-                    children: [
-                      const FormHeader(),
-                      FormRegister(
-                        emailController: emailController,
-                        nameController: nameController,
-                        dateController: dateController,
-                        jeniskelaminController: jeniskelaminController,
-                        noteleponeController: noteleponeController,
-                        passwordController: passwordController,
-                        obscureText: _obscureText,
-                        onToggle: () {
-                          setState(() {
-                            _obscureText = !_obscureText;
-                          });
-                        },
-                        konfirmasiPasswordController:
-                            konfirmasiPasswordController,
-                        obscureTextConfirm: _obscureTextConfirm,
-                        onToggleConfirm: () {
-                          setState(() {
-                            _obscureTextConfirm = !_obscureTextConfirm;
-                          });
-                        },
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 50),
+                      child: Image.asset(
+                        "assets/images/Register_Screen.png",
+                        height: 250,
+                        width: 300,
                       ),
-                      const SizedBox(height: 30),
-                      const RegisterButton(),
-                      const SizedBox(height: 20),
-                      const Center(child: LoginText()),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+
+                // Form
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    decoration: ShapeDecoration(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(35),
+                          topRight: Radius.circular(35),
+                        ),
+                      ),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          AppColors.accentColor,
+                          AppColors.backgroundColor,
+                        ],
+                      ),
+                    ),
+                    child: SafeArea(
+                      top: false,
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 0, vertical: 24),
+                        child: Column(
+                          children: [
+                            const FormHeader(),
+                            FormRegister(
+                              formKey: p.formKey, // <-- pakai formKey provider
+                              emailController: p.emailController,
+                              nameController: p.nameController,
+                              dateController: p.dateController,
+                              jeniskelaminController: p.jeniskelaminController,
+                              noteleponeController: p.noteleponeController,
+                              passwordController: p.passwordController,
+                              obscureText:
+                                  true, // visibilitas diatur lokal screen
+                              onToggle:
+                                  () {}, // (opsional) kamu bisa ikuti pola awalmu
+                              konfirmasiPasswordController:
+                                  p.konfirmasiPasswordController,
+                              obscureTextConfirm: true,
+                              onToggleConfirm: () {},
+                            ),
+                            const SizedBox(height: 30),
+                            RegisterButton(
+                              onTap: () => p.submit(context),
+                              loading: p.loading,
+                            ),
+                            const SizedBox(height: 20),
+                            const Center(child: LoginText()),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

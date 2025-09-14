@@ -1,6 +1,7 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
-import 'package:antrean_app/utils/colors.dart';
+import 'package:antrean_app/utils/auth_utils.dart';
+import 'package:antrean_app/constraints/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -12,6 +13,17 @@ class OpeningScreen extends StatefulWidget {
 }
 
 class _OpeningScreenState extends State<OpeningScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (await AuthUtils.isLoggedIn()) {
+        Navigator.pushReplacementNamed(context, '/home-screen');
+      }
+    });
+  }
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

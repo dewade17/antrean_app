@@ -1,4 +1,4 @@
-import 'package:antrean_app/utils/colors.dart';
+import 'package:antrean_app/constraints/colors.dart';
 import 'package:flutter/material.dart';
 
 class ButtonNext extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'package:antrean_app/screens/user/menu_informasi_kesehatan/more_menu_informasi_kesehatan/news_information/news_information.dart';
 import 'package:antrean_app/screens/user/menu_informasi_kesehatan/widget/header_text_informasi.dart';
 import 'package:antrean_app/screens/user/menu_informasi_kesehatan/widget/searchbox_informasi.dart';
-import 'package:antrean_app/utils/colors.dart';
+import 'package:antrean_app/constraints/colors.dart';
 import 'package:flutter/material.dart';
 
 class InformasiKesehatanScreen extends StatelessWidget {

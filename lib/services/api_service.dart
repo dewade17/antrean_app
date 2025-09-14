@@ -1,14 +1,10 @@
-// ignore_for_file: avoid_print, unused_local_variable
-import 'dart:io';
+import 'package:antrean_app/constraints/endpoints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ApiService {
-  final String baseUrl =
-      'https://parenting-brick-dream-attractive.trycloudflare.com/api';
-
-  Future<Map<String, dynamic>> fetchData(String endpoint) async {
+  Future<Map<String, dynamic>> fetchDataPrivate(String endpoint) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
@@ -17,7 +13,7 @@ class ApiService {
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/$endpoint'),
+      Uri.parse('${Endpoints.baseURL}/$endpoint'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -37,13 +33,13 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> postData(
+  Future<Map<String, dynamic>> postDataPrivate(
       String endpoint, Map<String, dynamic> data) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
     final response = await http.post(
-      Uri.parse('$baseUrl/$endpoint'),
+      Uri.parse('${Endpoints.baseURL}/$endpoint'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -61,13 +57,13 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> updateData(
+  Future<Map<String, dynamic>> updateDataPrivate(
       String endpoint, Map<String, dynamic> data) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
     final response = await http.put(
-      Uri.parse('$baseUrl/$endpoint'),
+      Uri.parse('${Endpoints.baseURL}/$endpoint'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -85,12 +81,12 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> deleteData(String endpoint) async {
+  Future<Map<String, dynamic>> deleteDataPrivate(String endpoint) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
     final response = await http.delete(
-      Uri.parse('$baseUrl/$endpoint'),
+      Uri.parse('${Endpoints.baseURL}/$endpoint'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -107,29 +103,29 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> login(Map<String, dynamic> data) async {
+  Future<Map<String, dynamic>> post(
+      Map<String, dynamic> data, String endpoint) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/auth/login'),
+      Uri.parse('${Endpoints.baseURL}/$endpoint'),
       headers: {
         'Content-Type': 'application/json',
       },
       body: jsonEncode(data),
     );
 
-    print('Request to: ${Uri.parse('$baseUrl/auth/login')}');
-    print('Status Code: ${response.statusCode}');
-    print('Response Body: ${response.body}');
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final decodedResponse = utf8.decode(response.bodyBytes);
+      return jsonDecode(decodedResponse);
     } else {
-      throw Exception('Failed to login: ${response.body}');
+      throw Exception(
+          'Failed (${response.statusCode}): ${response.body.isEmpty ? 'No body' : response.body}');
     }
   }
 
-  Future<Map<String, dynamic>?> getUserProfile(String token) async {
+  Future<Map<String, dynamic>?> getUserProfile(
+      String token, String endpoint) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/auth/getdataprivate'),
+      Uri.parse('${Endpoints.baseURL}/$endpoint'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -145,37 +141,7 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> uploadFile(
-    String endpoint,
-    File file, {
-    Map<String, String>? fields,
-  }) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    final url = Uri.parse('$baseUrl/$endpoint');
-
-    var request = http.MultipartRequest('POST', url);
-    request.headers['Authorization'] = 'Bearer $token';
-    request.files.add(await http.MultipartFile.fromPath('image', file.path));
-
-    if (fields != null) {
-      request.fields.addAll(fields);
-    }
-
-    final response = await request.send();
-    final responseStr = await response.stream.bytesToString();
-    final responseData = jsonDecode(responseStr);
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return responseData;
-    } else {
-      throw Exception(
-          'Failed to upload file: ${response.statusCode} - $responseStr');
-    }
-  }
-
-  Future<Map<String, dynamic>?> fetchDataface(String endpoint) async {
+  Future<List<dynamic>> fetchListPrivate(String endpoint) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
@@ -183,34 +149,31 @@ class ApiService {
       throw Exception('Token not found. Please login again.');
     }
 
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/$endpoint'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
+    final res = await http.get(
+      Uri.parse('${Endpoints.baseURL}/$endpoint'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
 
-      if (response.statusCode == 200) {
-        final decodedResponse = utf8.decode(response.bodyBytes);
-        final jsonResponse = jsonDecode(decodedResponse);
-        return jsonResponse;
-      } else if (response.statusCode == 401) {
-        await prefs.remove('token');
-        throw Exception('Unauthorized. Please login again.');
-      } else if (response.statusCode == 404) {
-        print('Data tidak ditemukan di endpoint: $endpoint');
-        return null;
-      } else {
-        // Error lain (misalnya 500, 403)
-        print('API Error [${response.statusCode}]: ${response.body}');
-        throw Exception('Failed to load data from $endpoint');
+    if (res.statusCode == 200) {
+      final decoded = utf8.decode(res.bodyBytes);
+      final jsonRes = jsonDecode(decoded);
+
+      if (jsonRes is List) return jsonRes;
+
+      // Beberapa API mungkin membungkus daftar di dalam { data: [...] }
+      if (jsonRes is Map<String, dynamic> && jsonRes['data'] is List) {
+        return List<dynamic>.from(jsonRes['data']);
       }
-    } catch (e) {
-      // Catch network errors, parsing errors, dll.
-      print('Exception in fetchData: $e');
-      throw Exception('Failed to connect to server.');
+
+      throw Exception('Unexpected response shape: expected List.');
+    } else if (res.statusCode == 401) {
+      await prefs.remove('token');
+      throw Exception('Unauthorized. Please login again.');
+    } else {
+      throw Exception('Failed to load list from $endpoint [${res.statusCode}]');
     }
   }
 }

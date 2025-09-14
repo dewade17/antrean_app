@@ -1,6 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:antrean_app/utils/colors.dart';
+import 'package:antrean_app/constraints/colors.dart';
 import 'package:flutter/material.dart';
 
 class HeaderContent extends StatelessWidget {

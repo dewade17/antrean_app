@@ -1,5 +1,7 @@
+import 'package:antrean_app/dto/layanan/layanan.dart';
+import 'package:antrean_app/dto/tanggungan/tanggungan.dart';
 import 'package:antrean_app/screens/user/menu_profile/widget/calendar_field_profile.dart';
-import 'package:antrean_app/utils/colors.dart';
+import 'package:antrean_app/constraints/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -9,8 +11,15 @@ class FormSettingProfile extends StatelessWidget {
   final TextEditingController dateprofileController;
   final TextEditingController jeniskelaminprofileController;
   final TextEditingController noteleponeprofileController;
-  final TextEditingController namatanggunganprofileController;
-  final TextEditingController namalayananprofileController;
+  final TextEditingController alamatprofileController;
+  final List<Layanan> layananItems;
+  final String? selectedLayananId;
+  final ValueChanged<String?> onChangeLayanan;
+
+  final List<Tanggungan> tanggunganItems;
+  final String? selectedTanggunganId;
+  final ValueChanged<String?> onChangeTanggungan;
+
   const FormSettingProfile({
     super.key,
     required this.emailprofileController,
@@ -18,8 +27,13 @@ class FormSettingProfile extends StatelessWidget {
     required this.dateprofileController,
     required this.jeniskelaminprofileController,
     required this.noteleponeprofileController,
-    required this.namatanggunganprofileController,
-    required this.namalayananprofileController,
+    required this.alamatprofileController,
+    required this.layananItems,
+    required this.selectedLayananId,
+    required this.onChangeLayanan,
+    required this.tanggunganItems,
+    required this.selectedTanggunganId,
+    required this.onChangeTanggungan,
   });
 
   @override
@@ -228,7 +242,7 @@ class FormSettingProfile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                ' Jenis Tanggungan',
+                ' Alamat',
                 style: GoogleFonts.poppins(
                   textStyle: TextStyle(
                     fontSize: 16,
@@ -237,6 +251,7 @@ class FormSettingProfile extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 8),
               Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -245,7 +260,8 @@ class FormSettingProfile extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 12),
                   child: TextFormField(
-                    controller: namatanggunganprofileController,
+                    controller: alamatprofileController,
+                    keyboardType: TextInputType.text,
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(vertical: 16),
@@ -265,27 +281,78 @@ class FormSettingProfile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                ' Jenis Layanan',
-                style: GoogleFonts.poppins(
-                  textStyle: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textDefaultColor,
-                  ),
-                ),
-              ),
+              Text(' Jenis Tanggungan',
+                  style: GoogleFonts.poppins(
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textDefaultColor,
+                    ),
+                  )),
+              const SizedBox(height: 8),
               Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 elevation: 3,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: TextFormField(
-                    controller: namalayananprofileController,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: DropdownButtonFormField<String>(
+                    value: selectedTanggunganId,
+                    items: tanggunganItems
+                        .map((t) => DropdownMenuItem<String>(
+                              value: t.idTanggungan,
+                              child: Text(t.namaTanggungan),
+                            ))
+                        .toList(),
+                    onChanged: onChangeTanggungan,
+                    decoration: const InputDecoration(
+                      hintText: "Pilih Tanggungan",
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 16),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        SizedBox(
+          width: 380,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(' Jenis Layanan',
+                  style: GoogleFonts.poppins(
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textDefaultColor,
+                    ),
+                  )),
+              const SizedBox(height: 8),
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 3,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: DropdownButtonFormField<String>(
+                    value: selectedLayananId,
+                    items: layananItems
+                        .map((l) => DropdownMenuItem<String>(
+                              value: l.idLayanan,
+                              child: Text(l.namaLayanan),
+                            ))
+                        .toList(),
+                    onChanged: onChangeLayanan,
+                    decoration: const InputDecoration(
+                      hintText: "Pilih Layanan",
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(vertical: 16),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
