@@ -1,6 +1,7 @@
 import 'package:antrean_app/constraints/colors.dart';
 import 'package:antrean_app/dto/video_kesehatan/video_kesehatan.dart';
 import 'package:antrean_app/provider/video_kesehatan/video_kesehatan_provider.dart';
+import 'package:antrean_app/screens/user/menu_informasi_kesehatan/more_menu_informasi_kesehatan/news_information/detail_news_information/video_detail_information.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -68,49 +69,54 @@ class _VideoContentState extends State<VideoContent> {
                 elevation: 2,
                 color: AppColors.accentColor,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                child: Padding(
-                  padding: EdgeInsetsGeometry.symmetric(horizontal: 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Image.asset(
-                        "assets/images/Video_Content.png",
-                        width: 500,
-                        fit: BoxFit.cover,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 15),
-                        child: Text(
-                          title,
-                          style: GoogleFonts.poppins(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textDefaultColor,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                child: InkWell(
+                  onTap: latestVideo == null
+                      ? null
+                      : () => _openVideoDetail(latestVideo),
+                  child: Padding(
+                    padding: EdgeInsetsGeometry.symmetric(horizontal: 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Image.asset(
+                          "assets/images/Video_Content.png",
+                          width: 500,
+                          fit: BoxFit.cover,
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 15),
-                        child: Text(
-                          subtitle,
-                          style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.textDefaultColor,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                        SizedBox(
+                          height: 20,
                         ),
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                    ],
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 15),
+                          child: Text(
+                            title,
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textDefaultColor,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 15),
+                          child: Text(
+                            subtitle,
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.textDefaultColor,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -122,13 +128,18 @@ class _VideoContentState extends State<VideoContent> {
               alignment: Alignment.centerRight,
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  "Selengkapnya ...",
-                  style: GoogleFonts.poppins(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                    fontStyle: FontStyle.italic,
-                    color: AppColors.hintColor,
+                child: GestureDetector(
+                  onTap: latestVideo == null
+                      ? null
+                      : () => _openVideoDetail(latestVideo),
+                  child: Text(
+                    "Selengkapnya ...",
+                    style: GoogleFonts.poppins(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w500,
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.hintColor,
+                    ),
                   ),
                 ),
               ),
@@ -212,5 +223,14 @@ class _VideoContentState extends State<VideoContent> {
           : '${difference.inMinutes} menit lalu';
     }
     return 'Baru saja';
+  }
+
+  void _openVideoDetail(Data video) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VideoDetailInformation(video: video),
+      ),
+    );
   }
 }

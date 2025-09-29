@@ -15,7 +15,7 @@ class HeaderHome extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "Hi, Ode",
+            "Hi, Ode", //name.user
             style: GoogleFonts.poppins(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -27,8 +27,8 @@ class HeaderHome extends StatelessWidget {
             color: AppColors.accentColor,
             onSelected: (value) {
               if (value == 2) {
-                Navigator.pushNamed(context, '/profile-users');
-              } else if (value == 3) {
+                //   Navigator.pushNamed(context, '/profile-users');
+                // } else if (value == 3) {
                 Navigator.pushNamed(context, '/info');
               } else if (value == 4) {
                 final authProvider =
@@ -72,19 +72,19 @@ class HeaderHome extends StatelessWidget {
                 ),
               ),
               // Informasi Aplikasi
-              PopupMenuItem(
-                value: 3,
-                child: Row(
-                  children: [
-                    const Icon(Icons.info_outline),
-                    const SizedBox(width: 10),
-                    Text(
-                      "Informasi Aplikasi",
-                      style: GoogleFonts.poppins(),
-                    ),
-                  ],
-                ),
-              ),
+              // PopupMenuItem(
+              //   value: 3,
+              //   child: Row(
+              //     children: [
+              //       const Icon(Icons.info_outline),
+              //       const SizedBox(width: 10),
+              //       Text(
+              //         "Informasi Aplikasi",
+              //         style: GoogleFonts.poppins(),
+              //       ),
+              //     ],
+              //   ),
+              // ),
               // Keluar
               PopupMenuItem(
                 value: 4,

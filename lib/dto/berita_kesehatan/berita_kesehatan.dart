@@ -3,6 +3,14 @@ import 'dart:convert';
 Beritakesehatan beritakesehatanFromJson(String str) =>
     Beritakesehatan.fromJson(json.decode(str));
 
+String _sanitizeHtml(String input) {
+  final lineBreakNormalized =
+      input.replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n');
+  final withoutTags =
+      lineBreakNormalized.replaceAll(RegExp(r'<[^>]*>', dotAll: true), '');
+  return withoutTags.trim();
+}
+
 String beritakesehatanToJson(Beritakesehatan data) =>
     json.encode(data.toJson());
 
@@ -49,7 +57,7 @@ class Data {
   factory Data.fromJson(Map<String, dynamic> json) => Data(
         idBerita: json["id_berita"],
         judul: json["judul"],
-        deskripsi: json["deskripsi"],
+        deskripsi: _sanitizeHtml(json["deskripsi"] ?? ''),
         tanggalPenerbitan: DateTime.parse(json["tanggal_penerbitan"]),
         fotoUrl: json["foto_url"],
         createdAt: DateTime.parse(json["createdAt"]),
