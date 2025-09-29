@@ -56,23 +56,16 @@ class _NewsContentState extends State<NewsContent> {
         : '25 Juli 2025';
 
     return Padding(
-      padding: EdgeInsetsGeometry.symmetric(
-        horizontal: 20,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Card(
         elevation: 5,
         color: AppColors.accentColor,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 20,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 "Berita Kesehatan",
                 style: GoogleFonts.poppins(
@@ -83,18 +76,18 @@ class _NewsContentState extends State<NewsContent> {
               ),
             ),
             Padding(
-              padding: EdgeInsetsGeometry.symmetric(vertical: 0, horizontal: 5),
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
               child: Card(
                 elevation: 2,
                 color: AppColors.accentColor,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero,
+                ),
                 child: Padding(
-                  padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
-                      SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 20),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -107,6 +100,7 @@ class _NewsContentState extends State<NewsContent> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                // Judul: batasi 2 baris agar tidak meluber
                                 Text(
                                   title,
                                   style: GoogleFonts.poppins(
@@ -114,9 +108,12 @@ class _NewsContentState extends State<NewsContent> {
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.textDefaultColor,
                                   ),
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
+                                  softWrap: true,
                                 ),
-                                SizedBox(height: 20),
+                                const SizedBox(height: 12),
+                                // Deskripsi: batasi 3 baris
                                 Text(
                                   description,
                                   style: GoogleFonts.poppins(
@@ -124,23 +121,27 @@ class _NewsContentState extends State<NewsContent> {
                                     fontWeight: FontWeight.w400,
                                     color: AppColors.textDefaultColor,
                                   ),
-                                  maxLines: 2,
+                                  maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(height: 20),
+                                const SizedBox(height: 16),
+                                // ROW yang sebelumnya overflow → bungkus tanggal dengan Expanded
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      dateText,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.hintColor,
+                                    Expanded(
+                                      child: Text(
+                                        dateText,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: AppColors.hintColor,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
                                       ),
                                     ),
-                                    GestureDetector(
+                                    InkWell(
                                       onTap: latestNews == null
                                           ? null
                                           : () {
@@ -154,9 +155,10 @@ class _NewsContentState extends State<NewsContent> {
                                                 ),
                                               );
                                             },
-                                      child: const Icon(
-                                        Icons.arrow_forward,
-                                        size: 16,
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(4.0),
+                                        child:
+                                            Icon(Icons.arrow_forward, size: 16),
                                       ),
                                     ),
                                   ],
@@ -166,21 +168,17 @@ class _NewsContentState extends State<NewsContent> {
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 30,
-                      ),
+                      const SizedBox(height: 30),
                     ],
                   ),
                 ),
               ),
             ),
-            SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Align(
               alignment: Alignment.centerRight,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
                   "Selengkapnya ...",
                   style: GoogleFonts.poppins(
@@ -192,9 +190,7 @@ class _NewsContentState extends State<NewsContent> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -213,28 +209,37 @@ class _NewsThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Ukuran tetap agar perhitungan Row stabil
+    const double size = 120;
+
     if (isLoading || imageUrl == null || imageUrl!.isEmpty) {
-      return Image.asset(
-        "assets/images/news_content.jpg",
-        width: 120,
-        height: 120,
-        fit: BoxFit.cover,
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.asset(
+          "assets/images/news_content.jpg",
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+        ),
       );
     }
 
     return SizedBox(
-      width: 120,
-      height: 120,
-      child: FadeInImage.assetNetwork(
-        placeholder: "assets/images/news_content.jpg",
-        image: imageUrl!,
-        fit: BoxFit.cover,
-        imageErrorBuilder: (context, error, stackTrace) {
-          return Image.asset(
-            "assets/images/news_content.jpg",
-            fit: BoxFit.cover,
-          );
-        },
+      width: size,
+      height: size,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: FadeInImage.assetNetwork(
+          placeholder: "assets/images/news_content.jpg",
+          image: imageUrl!,
+          fit: BoxFit.cover,
+          imageErrorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              "assets/images/news_content.jpg",
+              fit: BoxFit.cover,
+            );
+          },
+        ),
       ),
     );
   }
