@@ -235,20 +235,25 @@ class _NewsCard extends StatelessWidget {
     return Card(
       elevation: 2,
       color: AppColors.accentColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _NewsImage(url: news.fotoUrl),
+            // 🔧 gambar kini fleksibel (bisa mengecil sedikit bila perlu)
+            Flexible(
+              flex: 0,
+              child: _NewsImage(url: news.fotoUrl, maxSide: 120),
+            ),
             const SizedBox(width: 10),
+
+            // 🔧 konten teks tetap mengambil sisa lebar
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Judul: boleh 2 baris agar lebih aman
                   Text(
                     news.judul,
                     style: GoogleFonts.poppins(
@@ -256,9 +261,10 @@ class _NewsCard extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       color: AppColors.textDefaultColor,
                     ),
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
                   Text(
                     news.deskripsi,
                     style: GoogleFonts.poppins(
@@ -269,16 +275,21 @@ class _NewsCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
+
+                  // 🔧 tanggal bisa memendek agar ikon tidak mendorong keluar
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        formattedDate,
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.hintColor,
+                      Expanded(
+                        child: Text(
+                          formattedDate,
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.hintColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       GestureDetector(
@@ -298,27 +309,28 @@ class _NewsCard extends StatelessWidget {
 }
 
 class _NewsImage extends StatelessWidget {
-  const _NewsImage({required this.url});
+  const _NewsImage({required this.url, this.maxSide = 120});
 
   final String url;
+  final double maxSide;
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: SizedBox(
-        width: 120,
-        height: 120,
-        child: FadeInImage.assetNetwork(
-          placeholder: 'assets/images/news_content.jpg',
-          image: url,
-          fit: BoxFit.cover,
-          imageErrorBuilder: (context, error, stackTrace) {
-            return Image.asset(
-              'assets/images/news_content.jpg',
-              fit: BoxFit.cover,
-            );
-          },
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxSide, maxHeight: maxSide),
+      child: AspectRatio(
+        aspectRatio: 1, // selalu kotak
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: FadeInImage.assetNetwork(
+            placeholder: 'assets/images/news_content.jpg',
+            image: url,
+            fit: BoxFit.cover,
+            imageErrorBuilder: (context, error, stackTrace) {
+              return Image.asset('assets/images/news_content.jpg',
+                  fit: BoxFit.cover);
+            },
+          ),
         ),
       ),
     );

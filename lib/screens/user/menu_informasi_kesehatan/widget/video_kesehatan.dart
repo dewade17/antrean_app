@@ -42,24 +42,37 @@ class _VideoKesehatanState extends State<VideoKesehatan> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Video Kesehatan',
-                      style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textDefaultColor,
+                    // 1) Biar judul bisa mengecil/ellipsis saat space mepet
+                    Expanded(
+                      child: Text(
+                        'Video Kesehatan',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textDefaultColor,
+                        ),
                       ),
                     ),
-                    Row(
+                    const SizedBox(width: 8),
+
+                    // 2) Aksi kanan dibuat kompak & tidak memaksa lebar
+                    Wrap(
+                      spacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         IconButton(
                           tooltip: 'Muat ulang',
+                          iconSize: 20,
+                          padding: EdgeInsets.zero,
+                          constraints:
+                              const BoxConstraints(minWidth: 36, minHeight: 36),
                           icon: provider.loading
                               ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
+                                  width: 18,
+                                  height: 18,
                                   child:
                                       CircularProgressIndicator(strokeWidth: 2),
                                 )
@@ -72,11 +85,9 @@ class _VideoKesehatanState extends State<VideoKesehatan> {
                         PopupMenuButton<String>(
                           tooltip: 'Urutkan',
                           initialValue: provider.sort,
-                          onSelected: (value) {
-                            provider.changeSort(value);
-                          },
-                          itemBuilder: (BuildContext context) => [
-                            const PopupMenuItem<String>(
+                          onSelected: provider.changeSort,
+                          itemBuilder: (context) => const [
+                            PopupMenuItem<String>(
                               enabled: false,
                               child: Text(
                                 'Urutkan berdasarkan',
@@ -86,18 +97,16 @@ class _VideoKesehatanState extends State<VideoKesehatan> {
                                 ),
                               ),
                             ),
-                            const PopupMenuItem<String>(
-                              value: 'recent',
-                              child: Text('Terbaru'),
-                            ),
-                            const PopupMenuItem<String>(
-                              value: 'oldest',
-                              child: Text('Terlama'),
-                            ),
+                            PopupMenuItem<String>(
+                                value: 'recent', child: Text('Terbaru')),
+                            PopupMenuItem<String>(
+                                value: 'oldest', child: Text('Terlama')),
                           ],
+                          // 3) Child-nya jangan ambil lebar penuh
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.sort),
+                              const Icon(Icons.sort, size: 20),
                               const SizedBox(width: 6),
                               Text(
                                 provider.sort == 'oldest'
