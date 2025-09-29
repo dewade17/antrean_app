@@ -26,4 +26,8 @@ class Endpoints {
 
   //get-book-antrean
   static const String getAntrean = "book-antrean";
+  //get-book-antrean
+  static const String getBeritaKehatan = "berita-kesehatan";
+ static const String getVideoKehatan = "berita-kesehatan";
+
 }

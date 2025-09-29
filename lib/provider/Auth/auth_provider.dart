@@ -1,4 +1,4 @@
-// lib/providers/auth_provider.dart
+// lib/provider/Auth/auth_provider.dart
 import 'package:antrean_app/dto/auth/getdataprivate.dart';
 import 'package:antrean_app/dto/auth/login.dart';
 import 'package:antrean_app/services/api_service.dart';
@@ -48,7 +48,6 @@ class AuthProvider extends ChangeNotifier {
 
   /// Login → simpan token → fetchdataprivate → simpan id_user/nama/email → navigate
   Future<void> login(BuildContext context, Login payload) async {
-    final messenger = ScaffoldMessenger.of(context);
     _setLoading(true);
     try {
       // 1) Login (tanpa Authorization)
@@ -70,15 +69,16 @@ class AuthProvider extends ChangeNotifier {
       await _persistMinimalUserFields(userJson);
       notifyListeners();
 
-      // 5) Feedback
+      // 5) Pastikan context masih ter-mount sebelum menunjukkan snackbar atau navigasi
+      if (!context.mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
+
       messenger.showSnackBar(
         SnackBar(
             content: Text((res['message'] ?? 'Login berhasil').toString())),
       );
 
       // 6) Navigasi berdasar role (contoh: ADMIN/USER)
-      if (!context.mounted) return;
-
       final role = (_currentUser?.role ?? '').toUpperCase();
       String targetRoute = '/login'; // fallback jika bukan USER
       if (role == 'USER') {
@@ -87,7 +87,10 @@ class AuthProvider extends ChangeNotifier {
 
       Navigator.of(context).pushNamedAndRemoveUntil(targetRoute, (r) => false);
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Login gagal: $e')));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Login gagal: $e')));
+      }
       await _clearSession();
     } finally {
       _setLoading(false);

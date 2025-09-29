@@ -22,7 +22,6 @@ class _OpeningScreenState extends State<OpeningScreen> {
       }
     });
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -71,13 +70,13 @@ class _OpeningScreenState extends State<OpeningScreen> {
                     SizedBox(
                       height: 30,
                     ),
-                    Image.asset("assets/images/Image_stetoskop.png"),
+                    Image.asset("assets/images/icon_png.png"),
                     SizedBox(
                       height: 30,
                     ),
                     Center(
                       child: Text(
-                        "NEZA",
+                        "SICANTIK-App",
                         style: GoogleFonts.poppins(
                           textStyle: TextStyle(
                             fontSize: 34,
