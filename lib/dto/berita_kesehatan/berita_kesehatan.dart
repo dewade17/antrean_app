@@ -1,20 +1,22 @@
 import 'dart:convert';
 
-Videokesehatan videokesehatanFromJson(String str) =>
-    Videokesehatan.fromJson(json.decode(str));
+Beritakesehatan beritakesehatanFromJson(String str) =>
+    Beritakesehatan.fromJson(json.decode(str));
 
-String videokesehatanToJson(Videokesehatan data) => json.encode(data.toJson());
+String beritakesehatanToJson(Beritakesehatan data) =>
+    json.encode(data.toJson());
 
-class Videokesehatan {
+class Beritakesehatan {
   List<Data> data;
   Meta meta;
 
-  Videokesehatan({
+  Beritakesehatan({
     required this.data,
     required this.meta,
   });
 
-  factory Videokesehatan.fromJson(Map<String, dynamic> json) => Videokesehatan(
+  factory Beritakesehatan.fromJson(Map<String, dynamic> json) =>
+      Beritakesehatan(
         data: List<Data>.from(json["data"].map((x) => Data.fromJson(x))),
         meta: Meta.fromJson(json["meta"]),
       );
@@ -26,40 +28,40 @@ class Videokesehatan {
 }
 
 class Data {
-  String idVideo;
+  String idBerita;
   String judul;
   String deskripsi;
   DateTime tanggalPenerbitan;
-  String videoUrl;
+  String fotoUrl;
   DateTime createdAt;
   DateTime updatedAt;
 
   Data({
-    required this.idVideo,
+    required this.idBerita,
     required this.judul,
     required this.deskripsi,
     required this.tanggalPenerbitan,
-    required this.videoUrl,
+    required this.fotoUrl,
     required this.createdAt,
     required this.updatedAt,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-        idVideo: json["id_video"],
+        idBerita: json["id_berita"],
         judul: json["judul"],
         deskripsi: json["deskripsi"],
         tanggalPenerbitan: DateTime.parse(json["tanggal_penerbitan"]),
-        videoUrl: json["video_url"],
+        fotoUrl: json["foto_url"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "id_video": idVideo,
+        "id_berita": idBerita,
         "judul": judul,
         "deskripsi": deskripsi,
         "tanggal_penerbitan": tanggalPenerbitan.toIso8601String(),
-        "video_url": videoUrl,
+        "foto_url": fotoUrl,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
       };

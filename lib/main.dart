@@ -1,3 +1,4 @@
+import 'package:antrean_app/provider/berita_kesehatan/berita_kesehatan_provider.dart';
 import 'package:antrean_app/provider/book_antrean/book_antrean_provider.dart';
 import 'package:antrean_app/provider/book_antrean/get_booking_antrean.dart';
 import 'package:antrean_app/provider/dokter/detail_dokter_provider.dart';
@@ -7,6 +8,7 @@ import 'package:antrean_app/provider/dokter/dokter_provider.dart';
 import 'package:antrean_app/provider/layanan/layanan_provider.dart';
 import 'package:antrean_app/provider/tanggungan/tanggungan_provider.dart';
 import 'package:antrean_app/provider/users/user_provider.dart';
+import 'package:antrean_app/provider/video_kesehatan/video_kesehatan_provider.dart';
 import 'package:antrean_app/screens/auth_screen/login/login_screen.dart';
 import 'package:antrean_app/screens/auth_screen/register/register_screen.dart';
 import 'package:antrean_app/screens/start_screen/opening_screen.dart';
@@ -43,6 +45,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DetailDokterProvider()),
         ChangeNotifierProvider(create: (_) => BookAntreanProvider()),
         ChangeNotifierProvider(create: (_) => GetBookingProvider()),
+        ChangeNotifierProvider(create: (_) => VideoKesehatanProvider()),
+        ChangeNotifierProvider(create: (_) => BeritaKesehatanProvider()),
       ],
       child: MaterialApp(
         title: 'Antrean',
