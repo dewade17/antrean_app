@@ -1,7 +1,11 @@
-import 'package:antrean_app/screens/user/menu_informasi_kesehatan/more_menu_informasi_kesehatan/news_information/detail_news_information/news_detail_information.dart';
 import 'package:antrean_app/constraints/colors.dart';
+import 'package:antrean_app/dto/berita_kesehatan/berita_kesehatan.dart';
+import 'package:antrean_app/provider/berita_kesehatan/berita_kesehatan_provider.dart';
+import 'package:antrean_app/screens/user/menu_informasi_kesehatan/more_menu_informasi_kesehatan/news_information/detail_news_information/news_detail_information.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class News extends StatefulWidget {
   const News({super.key});
@@ -12,11 +16,23 @@ class News extends StatefulWidget {
 
 class _NewsState extends State<News> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<BeritaKesehatanProvider>().fetch();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final provider = context.watch<BeritaKesehatanProvider>();
+    final List<Data> items = provider.items;
+    final int currentPage = provider.page;
+    final int totalPages = provider.meta?.pages ?? 1;
+    final List<int> pageNumbers = _visiblePageNumbers(currentPage, totalPages);
+
     return Padding(
-      padding: EdgeInsetsGeometry.symmetric(
-        horizontal: 0,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 0),
       child: Card(
         elevation: 5,
         color: AppColors.accentColor,
@@ -24,9 +40,7 @@ class _NewsState extends State<News> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -41,19 +55,23 @@ class _NewsState extends State<News> {
                     ),
                   ),
                   PopupMenuButton<String>(
+                    tooltip: 'Urutkan',
+                    initialValue: provider.sort,
                     onSelected: (value) {
-                      // Tambahkan logika pengurutan berdasarkan value di sini
-                      if (value == 'Terbaru') {
-                        // Urutkan berdasarkan terbaru
-                      } else if (value == 'Terlama') {
-                        // Urutkan berdasarkan terlama
+                      if (value != provider.sort) {
+                        provider.fetch(sort: value, page: 1);
                       }
                     },
-                    icon: const Icon(Icons.more_horiz),
-                    itemBuilder: (BuildContext context) => [
-                      const PopupMenuItem<String>(
-                        enabled:
-                            false, // Menjadikan ini sebagai judul non-interaktif
+                    icon: provider.loading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.more_horiz),
+                    itemBuilder: (BuildContext context) => const [
+                      PopupMenuItem<String>(
+                        enabled: false,
                         child: Text(
                           'Urutkan berdasarkan',
                           style: TextStyle(
@@ -62,12 +80,12 @@ class _NewsState extends State<News> {
                           ),
                         ),
                       ),
-                      const PopupMenuItem<String>(
-                        value: 'Terbaru',
+                      PopupMenuItem<String>(
+                        value: 'recent',
                         child: Text('Terbaru'),
                       ),
-                      const PopupMenuItem<String>(
-                        value: 'Terlama',
+                      PopupMenuItem<String>(
+                        value: 'oldest',
                         child: Text('Terlama'),
                       ),
                     ],
@@ -76,96 +94,72 @@ class _NewsState extends State<News> {
               ),
             ),
             Padding(
-              padding: EdgeInsetsGeometry.symmetric(vertical: 0, horizontal: 5),
-              child: Card(
-                elevation: 2,
-                color: AppColors.accentColor,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                child: Padding(
-                  padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
+              child: Column(
+                children: [
+                  if (provider.loading && items.isEmpty)
+                    const SizedBox(
+                      height: 160,
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (provider.error != null && items.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Column(
                         children: [
-                          Image.asset(
-                            "assets/images/news_content.jpg",
-                            width: 120,
-                            height: 120,
-                            fit: BoxFit.cover,
-                          ),
-                          const SizedBox(
-                              width: 10), // jarak antara gambar dan teks
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Judul Berita",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textDefaultColor,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                SizedBox(height: 20),
-                                Text(
-                                  "Lorem ipsum dolor sit amet. Ad quas earum est magnam repellendus eum quod...",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.textDefaultColor,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                SizedBox(height: 20),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "25 Juli 2025",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.hintColor,
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  NewsDetailInformation()),
-                                        );
-                                      },
-                                      child:
-                                          Icon(Icons.arrow_forward, size: 16),
-                                    )
-                                  ],
-                                ),
-                              ],
+                          Text(
+                            provider.error ?? 'Gagal memuat berita kesehatan.',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: AppColors.errorColor,
                             ),
+                          ),
+                          const SizedBox(height: 12),
+                          ElevatedButton.icon(
+                            onPressed: provider.loading
+                                ? null
+                                : () => provider.fetch(page: 1),
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Coba lagi'),
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 30,
+                    )
+                  else if (items.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(
+                        child:
+                            Text('Belum ada berita kesehatan yang tersedia.'),
                       ),
-                    ],
-                  ),
-                ),
+                    )
+                  else
+                    ...items.map(
+                      (news) => _NewsCard(
+                        news: news,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  NewsDetailInformation(newsId: news.idBerita),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  if (provider.error != null && items.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: Text(
+                        provider.error!,
+                        style: const TextStyle(color: AppColors.errorColor),
+                      ),
+                    ),
+                ],
               ),
             ),
-            SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Align(
               alignment: Alignment.center,
               child: Padding(
@@ -176,51 +170,155 @@ class _NewsState extends State<News> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back_ios, size: 16),
-                      onPressed: () {
-                        // Aksi ke halaman sebelumnya
-                      },
+                      onPressed: provider.loading || currentPage <= 1
+                          ? null
+                          : () => provider.fetch(page: currentPage - 1),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        // Aksi ke halaman 1
-                      },
-                      child: const Text(
-                        "1",
-                        style: TextStyle(color: AppColors.textDefaultColor),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        // Aksi ke halaman 2
-                      },
-                      child: const Text(
-                        "2",
-                        style: TextStyle(color: AppColors.textDefaultColor),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        // Aksi ke halaman 3
-                      },
-                      child: const Text(
-                        "3",
-                        style: TextStyle(color: AppColors.textDefaultColor),
+                    ...pageNumbers.map(
+                      (page) => TextButton(
+                        onPressed: provider.loading || page == currentPage
+                            ? null
+                            : () => provider.fetch(page: page),
+                        child: Text(
+                          '$page',
+                          style: TextStyle(
+                            color: AppColors.textDefaultColor,
+                            fontWeight: page == currentPage
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                        ),
                       ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.arrow_forward_ios, size: 16),
-                      onPressed: () {
-                        // Aksi ke halaman selanjutnya
-                      },
+                      onPressed: provider.loading || currentPage >= totalPages
+                          ? null
+                          : () => provider.fetch(page: currentPage + 1),
                     ),
                   ],
                 ),
               ),
             ),
-            SizedBox(
-              height: 20,
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<int> _visiblePageNumbers(int currentPage, int totalPages) {
+    if (totalPages <= 0) return const <int>[1];
+    final int start = currentPage - 1 < 1 ? 1 : currentPage - 1;
+    int end = start + 2;
+    if (end > totalPages) {
+      end = totalPages;
+    }
+    final int adjustedStart = (end - 2) < 1 ? 1 : end - 2;
+    return [
+      for (int page = adjustedStart; page <= end; page++) page,
+    ];
+  }
+}
+
+class _NewsCard extends StatelessWidget {
+  const _NewsCard({required this.news, required this.onTap});
+
+  final Data news;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final String formattedDate =
+        DateFormat('d MMMM yyyy', 'id_ID').format(news.tanggalPenerbitan);
+
+    return Card(
+      elevation: 2,
+      color: AppColors.accentColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _NewsImage(url: news.fotoUrl),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    news.judul,
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textDefaultColor,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    news.deskripsi,
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textDefaultColor,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        formattedDate,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.hintColor,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: onTap,
+                        child: const Icon(Icons.arrow_forward, size: 16),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NewsImage extends StatelessWidget {
+  const _NewsImage({required this.url});
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: SizedBox(
+        width: 120,
+        height: 120,
+        child: FadeInImage.assetNetwork(
+          placeholder: 'assets/images/news_content.jpg',
+          image: url,
+          fit: BoxFit.cover,
+          imageErrorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              'assets/images/news_content.jpg',
+              fit: BoxFit.cover,
+            );
+          },
         ),
       ),
     );

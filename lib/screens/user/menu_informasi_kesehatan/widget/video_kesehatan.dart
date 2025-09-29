@@ -260,7 +260,7 @@ class _VideoItem extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  video.deskripsi,
+                  video.deskripsiPlain.isEmpty ? '-' : video.deskripsiPlain,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(

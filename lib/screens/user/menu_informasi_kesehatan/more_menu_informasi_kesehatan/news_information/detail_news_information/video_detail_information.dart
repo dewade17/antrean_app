@@ -1,6 +1,5 @@
 import 'package:antrean_app/constraints/colors.dart';
 import 'package:antrean_app/dto/video_kesehatan/video_kesehatan.dart';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -236,7 +235,9 @@ class _VideoDetailInformationState extends State<VideoDetailInformation> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  widget.video.deskripsi,
+                  widget.video.deskripsiPlain.isEmpty
+                      ? '-'
+                      : widget.video.deskripsiPlain,
                   textAlign: TextAlign.justify,
                   style: GoogleFonts.poppins(
                     fontSize: 15,

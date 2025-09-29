@@ -32,6 +32,7 @@ class Videokesehatan {
       meta: Meta.fromJson(metaMap),
     );
   }
+
   Map<String, dynamic> toJson() => {
         "data": List<dynamic>.from(data.map((x) => x.toJson())),
         "meta": meta.toJson(),
@@ -90,6 +91,11 @@ class Data {
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
       };
+
+  String get deskripsiPlain {
+    final withoutTags = deskripsi.replaceAll(RegExp(r'<[^>]*>'), ' ');
+    return withoutTags.replaceAll(RegExp(r'\s+'), ' ').trim();
+  }
 }
 
 class Meta {
@@ -121,7 +127,6 @@ class Meta {
       pages: parseInt('pages', 1),
     );
   }
-
   Map<String, dynamic> toJson() => {
         "page": page,
         "pageSize": pageSize,
